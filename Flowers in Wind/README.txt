@@ -13,6 +13,9 @@ Key Bindings:
  (		end/decrease wind and fog
  )		start/increase wind and fog
  </>		change wind direction
+ -/_		decrease fov (zoom in)
+ +/=		increase fov (zoom out)
+ x		show axes
  ESC		exit
 
 
