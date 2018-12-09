@@ -1,6 +1,4 @@
-Elizabeth Qiu 
-Final Project
-CSCI4229 Fall 2018
+Elizabeth Qiu
 
 Description: A scene of flowers and animated to imitate movement of being blown by the wind.
 When the wind is activated, petals will also blow around and eventually fog builds up if the wind is strong enough.
