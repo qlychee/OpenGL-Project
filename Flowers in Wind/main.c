@@ -107,6 +107,7 @@ unsigned char Buttons[3] = {0};
 //Flower
 double flow = 0.0;
 float angle = 0;
+int petalNum = 30;
 struct flowers {
    //Placement in xyz space
    double x;
@@ -453,7 +454,6 @@ static void drawGround(double x, double y, double z, unsigned int texnum)
 
 static void drawPetals(double x, double y, double z) {
 
-	int petalNum = 30;
    double h, phi = 0;
 	for (int k = 1; k <= petalNum; ++k)
 	{
@@ -476,7 +476,7 @@ static void drawPetals(double x, double y, double z) {
 
 }
 static void drawPetals2(double x, double y, double z) {
-	int petalNum = 25;
+	
    double h, phi = 0;
 	for (int k = 1; k <= petalNum; ++k)
 	{
@@ -830,9 +830,9 @@ void key(unsigned char ch, int x, int y)
    else if (ch == 'l' || ch == 'L')
       light = 1 - light;
    else if (ch == '-' || ch == '_')
-      fov ++;
-   else if (ch == '+' || ch == '=')
       fov --;
+   else if (ch == '+' || ch == '=')
+      fov ++;
    else if (ch == '[' && NUM_FLOWERS >=0)
       NUM_FLOWERS--;
    else if (ch == ']' && NUM_FLOWERS <=49)
@@ -857,6 +857,8 @@ void key(unsigned char ch, int x, int y)
       wind = 1;
       windChange = 1;
       fog_density += 0.001;
+      if(petalNum >0)
+		petalNum--;
    }
    else if (ch == '(' && speedWind > 0) {
       speedWind -= 2;
@@ -866,6 +868,8 @@ void key(unsigned char ch, int x, int y)
          wind = 0;
 
       fog_density -= 0.001;
+      if(petalNum <30)
+		petalNum++;
 
    }
    //Ambient Light
