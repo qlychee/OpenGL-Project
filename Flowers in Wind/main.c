@@ -29,7 +29,7 @@ unsigned int texture[3];
 unsigned int sky[6];
 unsigned int testSky;
 
-int NUM_FLOWERS  = 5;
+int NUM_FLOWERS  = 49;
 #define MAX_FLOWERS 50
 int wind = 0;
 
@@ -108,6 +108,8 @@ unsigned char Buttons[3] = {0};
 double flow = 0.0;
 float angle = 0;
 int petalNum = 30;
+int sway = 0;
+int swaySwitch = 0;
 struct flowers {
    //Placement in xyz space
    double x;
@@ -116,23 +118,25 @@ struct flowers {
    int type;
    
 };
-
 struct flowers flower[MAX_FLOWERS];
+//colors
+struct colors {
+	double r;
+	double g;
+	double b;
 
+};
+struct colors color[4];
+int colorInd = 0;
 // a structure to hold a particle
 struct Particle {
-
    // the current particle position
    float position[3];
-
    // the direction of the particle
    float direction[3];
-
    float color[3];
-
    // the lifespan
    float life;
-
    // pointer to the next particle
    struct Particle* next;
 };
@@ -153,12 +157,12 @@ Object* Particle_new() {
    
    int value = rand()%2;
    if (value == 0){
-	   p->color[0] = 0.80;
-	   p->color[1] = .70;//rand() % 15000/20000.0f;
-	   p->color[2] = 0.2;
+	   p->color[0] = color[colorInd].r;
+	   p->color[1] = color[colorInd].g;//rand() % 15000/20000.0f;
+	   p->color[2] = color[colorInd].b;
 	}else{
 		p->color[0] = 1;
-	   p->color[1] = 1;//rand() % 15000/20000.0f;
+	   p->color[1] = 1;
 	   p->color[2] = 1;
 	}
    
@@ -361,21 +365,6 @@ void drawHemisphere(float radius, int longSlices, int latSlices)
       glEnd();
    }
 }
-
-// Routine to draw circle.
-void drawCircle(float radius, int numVertices)
-{
-   int i;
-   float t;
-   glBegin(GL_LINE_LOOP);
-      for(i = 0; i < numVertices; ++i)
-	  {
-         t = 2 * PI * i / numVertices; 
-         glVertex3f(radius * cos(t), radius * sin(t), 0.0);
-	  }
-   glEnd();
-}
-
 // Draw lengthy box that will serve as ground for objects
 static void drawGround(double x, double y, double z, unsigned int texnum)
 {
@@ -470,7 +459,7 @@ static void drawPetals(double x, double y, double z) {
 		glRotatef(acos(h) / (2.0*PI)*360.0f, 0, 1, 0);
 		glTranslatef(0, 0, 1.5);
 		glScalef(1, 2.5, 7);
-		glutSolidSphere(1.5, 32, 32);
+		glutSolidSphere(1.5, 8, 8);
 		glPopMatrix();
 	}
 
@@ -481,7 +470,7 @@ static void drawPetals2(double x, double y, double z) {
 	for (int k = 1; k <= petalNum; ++k)
 	{
 		glPushMatrix();
-		glColor3f(0.8,0.7,0.2);
+		glColor3f(color[colorInd].r,color[colorInd].g,color[colorInd].b);
 		h = -1.0 + 0.5*k / petalNum;
 		//h = -0.8;
 		phi = phi + 3.6 / sqrt((double)petalNum)*(1.0 / sqrt((double)1 - pow(h, 2.0)));
@@ -493,7 +482,7 @@ static void drawPetals2(double x, double y, double z) {
 		glRotatef(acos(h) / (2.0*PI)*360.0f, 0, 1, 0);
 		glTranslatef(0, 0, 1.5);
 		glScalef(1, 2.5, 7);
-		glutSolidSphere(1.5, 32, 32);
+		glutSolidSphere(1.5, 8, 8);
 		glPopMatrix();
 	}
 	
@@ -544,7 +533,7 @@ static void drawFlower(struct flowers f)
    glTranslated(f.x, f.y, f.z);
    glScaled(0.016, 0.016, 0.016);
    glRotatef(angle,Cos(thetaWind),0,-Sin(thetaWind));
-	double h = 50;
+	double h = 40;
    drawStem(2, h, 0, 0, 0);
    drawCenter(0,h,0);
    drawPetals(0,h,0);
@@ -556,7 +545,7 @@ static void drawFlower2(struct flowers f)
    glTranslated(f.x, f.y, f.z);
    glScaled(0.016, 0.016, 0.016);
    glRotatef(angle,Cos(thetaWind),0,-Sin(thetaWind));
-	double h = 50;
+	double h = 40;
    drawStem(2, h, 0, 0, 0);
    drawCenter(0,h,0);
    drawPetals2(0,h,0);
@@ -769,7 +758,13 @@ void display()
 
 void idle()
 {
+
    double t = glutGet(GLUT_ELAPSED_TIME)/5000.0;
+   sway++; //trying to control sway animation
+   if(sway == 300){//reset
+	   sway = 0;
+   }
+   swaySwitch = 1-swaySwitch;
    zh = fmod(180*t,360);
    int i;
    // update the frame time
@@ -785,7 +780,21 @@ void idle()
 
    // remove any dead particles
    RemoveDeadParticles();   
-
+   
+   if(wind && speedWind <40){
+	   if(sway%3==0){
+		   if(swaySwitch)
+		       angle +=2;
+		   else
+			   angle -=2;
+		}
+	}
+	if(speedWind >= 40){
+		if(swaySwitch)
+		   angle +=2;
+	   else
+		   angle -=2;
+	}
    glutPostRedisplay();
 }
 
@@ -829,6 +838,12 @@ void key(unsigned char ch, int x, int y)
       axes = 1 - axes;
    else if (ch == 'l' || ch == 'L')
       light = 1 - light;
+   else if (ch == 'c' || ch == 'C'){
+	   colorInd ++;
+	   if(colorInd == 4){
+		   colorInd =0; //reset
+       }
+   }
    else if (ch == '-' || ch == '_')
       fov --;
    else if (ch == '+' || ch == '=')
@@ -975,6 +990,11 @@ void reshape(int width,int height)
  */
 int main(int argc,char* argv[])
 {
+	//initilize colors
+	color[0].r=0.8;color[0].g=0.7;color[0].b=0.2;
+	color[1].r=0;color[1].g=0.0;color[1].b=1; //blue
+	color[2].r=1;color[2].g=0;color[2].b=1;//magenta
+	color[3].r=1;color[3].g=0;color[3].b=0; //red
 	//initialize flowers
 	int fx,fz;
 	fx = -6;
