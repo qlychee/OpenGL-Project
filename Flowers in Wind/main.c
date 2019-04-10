@@ -20,7 +20,6 @@
 #include "CSCIx229.h"
 #include "FrameTimer.h"
 
-#define cylAngle atan(radius2/height);
 #define PI 3.14159265358979324
 
 
