@@ -1,7 +1,3 @@
-Elizabeth Qiu 
-HW2- Lorenz Attractor
-CSCI4229 Fall 2018
-
 Three dimensional OpenGL visualization of the Lorenz Attractor
 
 Objective:
@@ -34,6 +30,3 @@ Key Bindings:
  d        set s/r back to default
  arrows   change view angle
  ESC      exit
-
-
-time spent: 2.5 hours
